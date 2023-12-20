@@ -1,6 +1,6 @@
 # UBER-Taxi-demand-prediction
 # Data Information
-Get the data from: [http://www.nyc.gov/html/tlc/html/about/trip_record_data.shtml](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page) (2022-2023 data) The data used in the attached datasets were collected and provided to the NYC Taxi and Limousine Commission (TLC)
+Get the data from: [Click The Link For Collecting Data](https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page) (2022-2023 data) The data used in the attached datasets were collected and provided to the NYC Taxi and Limousine Commission (TLC)
 
 ## Information on taxis:
 <b> Yellow Taxi: Yellow Medallion Taxicabs </b> <br>
@@ -13,7 +13,7 @@ A pre-arrangement with a dispatcher or limo company accesses FHV transportation.
 The SHL program will allow livery vehicle owners to license and outfit their vehicles with green borough taxi branding, meters, credit card machines, and ultimately the right to accept street hails in addition to pre-arranged rides.
 
 
-<b> Footnote: </b> <br>
+<b> FootNote: </b> <br>
 In the given notebook we are considering only the yellow taxis for the time between 2022 - 2023
 # ML Problem Formulation
 <b> Time-series forecasting and Regression </b>
@@ -27,7 +27,7 @@ To solve the above, we would use data collected in 2022 - 2023.
 - mape = mean absolute percentage error.
 - mae = mean absolute error.
 - r2 = r2 score.
-![image](https://github.com/Rasel1435/uber-taxi-demand/assets/91475469/13666605-b29b-4d1a-9c18-d2a2059a0849)
+![image](https://github.com/Rasel1435/uber-taxi-demand/assets/91475469/11d18462-004e-429c-a95c-e79cc3efb153)
 
 
 
