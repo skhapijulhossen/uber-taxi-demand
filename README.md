@@ -27,7 +27,7 @@ To solve the above, we would use data collected in 2022 - 2023.
 - mape = mean absolute percentage error.
 - mae = mean absolute error.
 - r2 = r2 score.
-
+https://github.com/Rasel1435/uber-taxi-demand/blob/dev-rasel/New_york.gif
 
 
 # Check This all -->
