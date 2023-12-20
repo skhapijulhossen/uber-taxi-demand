@@ -22,11 +22,12 @@ In the given notebook we are considering only the yellow taxis for the time betw
 - To find the number of pickups, given location coordinates (latitude and longitude), and time, in the query region and surrounding regions.
 To solve the above, we would use data collected in 2022 - 2023.
 
-# Performance metrics
+# Performance Metrics
 - rmse = mean squared error.
 - mape = mean absolute percentage error.
 - mae = mean absolute error.
 - r2 = r2 score.
+![image](https://github.com/Rasel1435/uber-taxi-demand/assets/91475469/13666605-b29b-4d1a-9c18-d2a2059a0849)
 
 
 
