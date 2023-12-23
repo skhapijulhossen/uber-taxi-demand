@@ -1,2 +1,4 @@
 notebooks/b_PreProcess/.ipynb_checkpoints/
 data/
+notebooks/c_Model/mlruns
+notebooks/d_Tuning/mlruns
