@@ -1,5 +1,6 @@
-import numpy as np
 import pandas as pd
+import logging
+
 from feature_engine.datetime import DatetimeFeatures
 from feature_engine.timeseries.forecasting import LagFeatures, WindowFeatures, ExpandingWindowFeatures
 from sklearn.tree import DecisionTreeRegressor
@@ -7,39 +8,48 @@ from feature_engine.selection import SmartCorrelatedSelection, RecursiveFeatureE
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
 
-def getData() -> pd.DataFrame:
+### Logging Configuration
+
+
+def getData(path: str) -> pd.DataFrame:
     try:
-        df = pd.read_csv(r'../data/2022.csv')
+        df = pd.read_csv(path)
         return df
     except Exception as e:
-        print(f"An error occurred: {e}")
+        logging.error(f"An error occurred: {e}")
 
-def dataCleaning() -> pd.DataFrame:
+def dataCleaning() -> None:
+    global df
     try:
-        df_clean = pd.read_parquet(r'../data/2022/V2_Clean_Data.parquet')
-        return df_clean
+        df['timestamp'] = pd.to_datetime(df.tpep_pickup_datetime)
+        df.drop(columns=['tpep_pickup_datetime'], inplace= True)
+        df.drop_duplicates(subset= ['timestamp'], inplace=True)
+        df = df[~(df.timestamp > pd.Timestamp('2022-12-31 00:00:00'))]
+        
     except Exception as e:
         print(f'Error: {e}')
-        return None
+        
 
 # featureEngineering start here
-def add_temporal_features(df: pd.DataFrame) -> pd.DataFrame:
+def add_temporal_features() -> None:
+    global df
     try:
         features_to_extract = [
             "month", "quarter", "semester", "year", "week", "day_of_week", "day_of_month",
             "day_of_year", "weekend", "month_start", "month_end", "quarter_start",
             "quarter_end", "year_start", "year_end", "leap_year", "days_in_month", "hour", "minute", "second"
-        ]
+            ]
 
         temporal = DatetimeFeatures(features_to_extract=features_to_extract).fit_transform(df[['timestamp']])
         for col in temporal.columns:
             df.loc[:, col] = temporal[col].values
-        return df
+        
     except Exception as e:
         print(f'add_temporal_features ERROR: {e}')
-        return df
 
-def add_lag_features(df: pd.DataFrame) -> pd.DataFrame:
+
+def add_lag_features() -> None:
+    global df
     try:
         lagfeatures = LagFeatures(variables=None, periods=[1, 2, 4, 8, 16, 24], freq=None, sort_index=True,
                                 missing_values='raise', drop_original=False)
@@ -48,51 +58,52 @@ def add_lag_features(df: pd.DataFrame) -> pd.DataFrame:
 
         for col in list(features.columns)[3:]:
             df[col] = features[col].values
-        return df
+        
     except Exception as e:
         print(f'add_lag_features ERROR: {e}')
-        return df
+        
 
-def add_window_features(df: pd.DataFrame) -> pd.DataFrame:
+def add_window_features() -> None:
+    global df
     try:
         window = WindowFeatures(
             variables=None, window=7, min_periods=1,
             functions=['mean', 'std', 'median'], periods=1, freq=None, sort_index=True,
             missing_values='raise', drop_original=False
-        )
+            )
         window.fit(df[['timestamp', 'passenger_demand', 'taxi_demand']])
         features = window.fit_transform(df[['timestamp', 'passenger_demand', 'taxi_demand']])
         
         for col in list(features.columns)[3:]:
             df[col] = features[col].values
-        return df
+        
     except Exception as e:
         print(f'add_window_features ERROR: {e}')
-        return df
+        
 
-def add_exp_window_features(df: pd.DataFrame) -> pd.DataFrame:
+def add_exp_window_features() -> None:
+    global df
     try:
         expwindow = ExpandingWindowFeatures(
             variables=None, min_periods=None, functions='std',
             periods=1, freq=None, sort_index=True,
             missing_values='raise', drop_original=False
-        )
+            )
         expwindow.fit(df[['timestamp', 'passenger_demand', 'taxi_demand']])
         features = expwindow.fit_transform(df[['timestamp', 'passenger_demand', 'taxi_demand']])
 
         for col in list(features.columns)[3:]:
             df[col] = features[col].values
-        return df
+        
     except Exception as e:
         print(f'add_exp_window_features ERROR: {e}')
-        return df
+        
 
 # Feture Selection Start here
 
-def select_best_features(output_file_path):
+def select_best_features():
+    global df
     try:
-        df = pd.read_parquet(output_file_path)
-        
         X = df.drop(columns=['timestamp','passenger_demand', 'taxi_demand'])
         y = df['taxi_demand']
         
@@ -100,74 +111,88 @@ def select_best_features(output_file_path):
             variables=None, method='pearson', threshold=0.5,
             missing_values='ignore', selection_method='variance',
             confirm_variables=False
-        )
+            )
         scs_columns = set(scs.fit_transform(X).columns)
         
         rfe = RecursiveFeatureElimination(
             DecisionTreeRegressor(max_depth=3), scoring='r2', cv=3, threshold=0.01,
             variables=None, confirm_variables=False
-        )
+            )
         
         rfe_columns = rfe.fit_transform(X, y)
         scs_columns.update(rfe_columns)
         
-        return scs_columns
+        df = df[list(scs_columns)]
     except Exception as e:
         print(f'select_best_features Error: {e}')
 
 # Data Scaling here
-def normalizeScaling(df: pd.DataFrame) -> pd.DataFrame:
+def normalizeScaling() -> None:
+    global df
     try:
         scaler = StandardScaler()
         scaler.fit(df.drop(columns='taxi_demand'))
         df.loc[:, df.columns[:-1]] = scaler.transform(df.drop(columns='taxi_demand'))
-        return df
+        
     except Exception as e:
         print(f'normalizeScaling Error: {e}')
-        return df
+        
     
 # DimensonalRedaction start from here
-def PCA(df: pd.DataFrame) -> pd.DataFrame:
+def reduceDimensionality() -> None:
+    global df
     try:
         features = df.drop(columns=['taxi_demand'])
         target = df['taxi_demand']
         pca = PCA(n_components=19)
         features_reduced = pca.fit_transform(features)
-        reduced_df = pd.DataFrame(features_reduced, columns=[f'PC{i}' for i in range(1, 20)])
-        reduced_df['taxi_demand'] = target
-        return reduced_df
+        df = pd.DataFrame(features_reduced, columns=[f'PC{i}' for i in range(1, 20)])
+        df['taxi_demand'] = target
+        print(df.head())
+        return
+        
     except Exception as e:
         print(f'PCA ERROR: {e}')
-        return df
+        
     
 
 # Now Time to call the all function and save it 
 
-def finalResult(df_clean):
+def preprocessFeatures():
+    global df
     try:
-        df_with_temporal = add_temporal_features(df_clean.copy())
-        df_with_lag = add_lag_features(df_with_temporal.copy())
-        df_with_window = add_window_features(df_with_lag.copy())
-        df_with_EWF = add_exp_window_features(df_with_window.copy())
-        df_final = df_with_EWF.dropna()
-        
-        if df_final.empty:
+        add_temporal_features()
+        add_lag_features()
+        add_window_features()
+        add_exp_window_features()
+        df.dropna(inplace=True)
+        ### call other steps
+        select_best_features()
+        normalizeScaling()
+        reduceDimensionality()
+        if df.empty:
             print("DataFrame is empty after processing features.")
         
-        return df_final
     except Exception as e:
-        print(f'finalResult Error: {e}')
-        return None 
+        print(f'PreProcess Error: {e}')
 
-# Get the cleaned data
-df_clean = dataCleaning()
 
-# Get processed data with feature selection
-processed_data = finalResult(df_clean)
 
-if processed_data is not None:
-    # Save the processed data
-    output_file_path = r"C:/Users/SRA/Desktop/backup/C/MLgrit/time_series_project/uber-taxi-demand/data/featurePipelineFinalData"
-    processed_data.to_csv(output_file_path, index=False)
-else:
-    print("No valid processed data to save.")
+
+if __name__ == '__main__':
+    
+    #Loading data
+    df = getData(r'../data/2022.csv')
+
+    # Get the cleaned data
+    dataCleaning()
+
+    # Get processed data with feature selection
+    preprocessFeatures()
+
+    if df is not None:
+        # Save the processed data
+        output_file_path = r"C:/Users/SRA/Desktop/backup/C/MLgrit/time_series_project/uber-taxi-demand/data/featurePipelineFinalData"
+        df.to_csv(output_file_path, index=False)
+    else:
+        print("No valid processed data to save.")
