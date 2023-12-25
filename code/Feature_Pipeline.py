@@ -7,16 +7,24 @@ from sklearn.tree import DecisionTreeRegressor
 from feature_engine.selection import SmartCorrelatedSelection, RecursiveFeatureElimination
 from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
+from datetime import datetime
 
 ### Logging Configuration
+logging.basicConfig(
+    level=logging.DEBUG,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    datefmt= '%d-%b(%m)-%Y %I:%M:%S',
+)
 
+logger = logging.getLogger(__name__)
 
+#Lodding Data
 def getData(path: str) -> pd.DataFrame:
     try:
         df = pd.read_csv(path)
         return df
     except Exception as e:
-        logging.error(f"An error occurred: {e}")
+        logger.error(f"Check Inside The getData() Function: {e}")
 
 def dataCleaning() -> None:
     global df
@@ -27,7 +35,7 @@ def dataCleaning() -> None:
         df = df[~(df.timestamp > pd.Timestamp('2022-12-31 00:00:00'))]
         
     except Exception as e:
-        print(f'Error: {e}')
+        logger.error(f'Check Inside The dataCleaning() Function: {e}')
         
 
 # featureEngineering start here
@@ -45,7 +53,7 @@ def add_temporal_features() -> None:
             df.loc[:, col] = temporal[col].values
         
     except Exception as e:
-        print(f'add_temporal_features ERROR: {e}')
+        logger.error(f'Check Inside The add_temporal_features() Function: {e}')
 
 
 def add_lag_features() -> None:
@@ -60,7 +68,7 @@ def add_lag_features() -> None:
             df[col] = features[col].values
         
     except Exception as e:
-        print(f'add_lag_features ERROR: {e}')
+        logger.error(f'Check Inside The add_lag_features() Function: {e}')
         
 
 def add_window_features() -> None:
@@ -78,7 +86,7 @@ def add_window_features() -> None:
             df[col] = features[col].values
         
     except Exception as e:
-        print(f'add_window_features ERROR: {e}')
+        logger.error(f'Check Inside The add_window_features() Function: {e}')
         
 
 def add_exp_window_features() -> None:
@@ -96,7 +104,7 @@ def add_exp_window_features() -> None:
             df[col] = features[col].values
         
     except Exception as e:
-        print(f'add_exp_window_features ERROR: {e}')
+        logger.error(f'Check Inside The add_exp_window_features() Function: {e}')
         
 
 # Feture Selection Start here
@@ -124,7 +132,7 @@ def select_best_features():
         
         df = df[list(scs_columns)]
     except Exception as e:
-        print(f'select_best_features Error: {e}')
+        logger.error(f'Check Inside The select_best_features() Function: {e}')
 
 # Data Scaling here
 def normalizeScaling() -> None:
@@ -135,7 +143,7 @@ def normalizeScaling() -> None:
         df.loc[:, df.columns[:-1]] = scaler.transform(df.drop(columns='taxi_demand'))
         
     except Exception as e:
-        print(f'normalizeScaling Error: {e}')
+        logger.error(f"Check Inside The normalizeScaling() Function: {e}")
         
     
 # DimensonalRedaction start from here
@@ -148,11 +156,9 @@ def reduceDimensionality() -> None:
         features_reduced = pca.fit_transform(features)
         df = pd.DataFrame(features_reduced, columns=[f'PC{i}' for i in range(1, 20)])
         df['taxi_demand'] = target
-        print(df.head())
-        return
         
     except Exception as e:
-        print(f'PCA ERROR: {e}')
+        logger.error(f"Check Inside The reduceDimensionality() Function: {e}")
         
     
 
@@ -174,7 +180,7 @@ def preprocessFeatures():
             print("DataFrame is empty after processing features.")
         
     except Exception as e:
-        print(f'PreProcess Error: {e}')
+        logger.error(f'Check Inside The preprocessFeatures() Function: {e}')
 
 
 
