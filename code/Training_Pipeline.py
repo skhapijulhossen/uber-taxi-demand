@@ -23,24 +23,24 @@ logger = logging.getLogger(__name__)
 #Loading data
 def getData(path: str) -> pd.DataFrame:
     try:
-        df = pd.read_csv(path)
+        df = pd.read_parquet(path)
         return df
     except Exception as e:
         logger.error(f"in getData(): {e}")
 
-def spliting() -> tuple:
+def splitting() -> tuple:
     global df
     try:
-        X = df.drop(columns=["taxi_demand"])
+        X = df.drop(columns=["taxi_demand",])
         y = df.taxi_demand
         X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
         return X_train, X_test, y_train, y_test
     except Exception as e:
-        logger.error(f'in spliting(): {e}')
+        logger.error(f'in splitting(): {e}')
 
 def myModelxgb(X_train, X_test, y_train, y_test) -> xgb.XGBRegressor:
     try:
-        mlflow.set_experiment("XGBoostTuning")
+        mlflow.set_experiment("TimeSeries")
         with mlflow.start_run():
             x_model = xgb.XGBRegressor()
             param_dist = {
@@ -50,7 +50,6 @@ def myModelxgb(X_train, X_test, y_train, y_test) -> xgb.XGBRegressor:
                 'gamma': [0, 0.1, 0.2],
                 'colsample_bytree': [0.7, 0.8, 0.9],
                 'nthread': randint(1, 16),
-                'eval_metric': ['rmse', 'mae'],
             }
             # run a randomized search
             n_iter_search = 20
@@ -85,7 +84,7 @@ def myModelxgb(X_train, X_test, y_train, y_test) -> xgb.XGBRegressor:
         logger.error(f"in myModelxgb(): {e}")
 
 if __name__ == '__main__':
-    df = getData('../data/featurePipelineFinalData.csv')
-    X_train, X_test, y_train, y_test = spliting()
+    df = getData(r'../data/featurePipelineFinalData.parquet')
+    X_train, X_test, y_train, y_test = splitting()
     best_model = myModelxgb(X_train, X_test, y_train, y_test)
     # we have to use 'best_model' for further predictions or inference
