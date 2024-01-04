@@ -33,9 +33,9 @@ def splitting() -> tuple:
     try:
         X_train = df.drop(columns=["taxi_demand",])
         y_train = df.taxi_demand
-        df2 = df2.read_parquet(r'../data/feature-2023.parquet')
-        X_train = df2.drop(columns=["taxi_demand",])
-        y_train = df2.taxi_demand
+        df2 = pd.read_parquet(r'../data/feature-2023.parquet')
+        X_test = df2.drop(columns=["taxi_demand",])
+        y_test = df2.taxi_demand
         return X_train, X_test, y_train, y_test
     except Exception as e:
         logger.error(f'in splitting(): {e}')
