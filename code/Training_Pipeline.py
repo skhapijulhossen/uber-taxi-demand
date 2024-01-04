@@ -59,19 +59,19 @@ def myModelxgb(X_train, X_test, y_train, y_test) -> xgb.XGBRegressor:
                                                n_iter=n_iter_search, random_state=42)
             # fit the model
             random_search.fit(X_train, y_train)
-            # Predict on the test set using the best estimator from the grid search
+            # Predict on the test set using the best estimator from the grid search 2023
             y_pred = random_search.best_estimator_.predict(X_train)
             
             # Log parameters 
             # mlflow.log_params(random_search.best_params_)
             
-            # Calculate and log the evaluation metric (e.g., RMSE)
+            # Calculate and log the evaluation metric (e.g., RMSE) 2022
             rmse = mean_squared_error(y_train, y_pred, squared=False)
             mape = mean_absolute_percentage_error(y_train, y_pred)
             mae = mean_absolute_error(y_train, y_pred)
             r2 = r2_score(y_train, y_pred)
 
-            #Log Matrics
+            #Log Matrics 2022
             mlflow.log_metrics({
                 "RMSE_train": rmse,
                 "MAE_train": mae,
@@ -79,12 +79,13 @@ def myModelxgb(X_train, X_test, y_train, y_test) -> xgb.XGBRegressor:
                 "R2_SCORE_train": r2
             })
             
+            # Predict on the test set using the best estimator from the grid search 2023
             y_pred = random_search.best_estimator_.predict(X_test)
             
             # Log parameters 
             mlflow.log_params(random_search.best_params_)
             
-            # Calculate and log the evaluation metric (e.g., RMSE)
+            # Calculate and log the evaluation metric (e.g., RMSE) 2023
             rmse = mean_squared_error(y_test, y_pred, squared=False)
             mape = mean_absolute_percentage_error(y_test, y_pred)
             mae = mean_absolute_error(y_test, y_pred)

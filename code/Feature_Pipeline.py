@@ -157,8 +157,8 @@ def preprocessFeatures():
 
 
 if __name__ == '__main__':
-    processed_data = {}  # Dictionary to store processed data
-    
+    # Dictionary to store processed data
+    processed_data = {}
     # Loading data
     for path in [r'../data/2022.csv', r'../data/2023.csv']:
         df = getData(path)
