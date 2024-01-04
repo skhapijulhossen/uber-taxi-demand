@@ -157,17 +157,21 @@ def preprocessFeatures():
 
 
 if __name__ == '__main__':
-    #Loading data
-    df = getData(r'../data/2022.csv')
-    # Get the cleaned data
-    dataCleaning()
-    # Get processed data with feature selection
-    preprocessFeatures()
-    if df is not None:
-        # Save the processed data
-        output_file_path = r"C:/Users/SRA/Desktop/backup/C/MLgrit/time_series_project/uber-taxi-demand/data/featurePipelineFinalData.parquet"
-        df.dropna(axis=0, inplace=True)
-        df.to_parquet(output_file_path, index=False)
-        print(f"data has been saved successfully!")
-    else:
-        print("No valid processed data to save.")
+    processed_data = {}  # Dictionary to store processed data
+    
+    # Loading data
+    for path in [r'../data/2022.csv', r'../data/2023.csv']:
+        df = getData(path)
+        # Get the cleaned data
+        dataCleaning()
+        # Get processed data with feature selection
+        preprocessFeatures()
+        if df is not None:
+            file_name = path.split('/')[-1].split('.')[0]  # Extracting file name without extension
+            processed_data[file_name] = df.copy()  # Store processed data in the dictionary
+            processed_data[file_name].dropna(axis=0, inplace=True)
+            output_file_path = f'../data/feature-{file_name}.parquet'
+            processed_data[file_name].to_parquet(output_file_path, index=False)
+            print(f"Data from {file_name} has been saved successfully!")
+        else:
+            print(f"No valid processed data in {file_name} to save.")

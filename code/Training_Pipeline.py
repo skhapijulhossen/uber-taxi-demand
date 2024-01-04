@@ -31,9 +31,11 @@ def getData(path: str) -> pd.DataFrame:
 def splitting() -> tuple:
     global df
     try:
-        X = df.drop(columns=["taxi_demand",])
-        y = df.taxi_demand
-        X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+        X_train = df.drop(columns=["taxi_demand",])
+        y_train = df.taxi_demand
+        df2 = df2.read_parquet(r'../data/feature-2023.parquet')
+        X_train = df2.drop(columns=["taxi_demand",])
+        y_train = df2.taxi_demand
         return X_train, X_test, y_train, y_test
     except Exception as e:
         logger.error(f'in splitting(): {e}')
@@ -58,10 +60,30 @@ def myModelxgb(X_train, X_test, y_train, y_test) -> xgb.XGBRegressor:
             # fit the model
             random_search.fit(X_train, y_train)
             # Predict on the test set using the best estimator from the grid search
+            y_pred = random_search.best_estimator_.predict(X_train)
+            
+            # Log parameters 
+            # mlflow.log_params(random_search.best_params_)
+            
+            # Calculate and log the evaluation metric (e.g., RMSE)
+            rmse = mean_squared_error(y_train, y_pred, squared=False)
+            mape = mean_absolute_percentage_error(y_train, y_pred)
+            mae = mean_absolute_error(y_train, y_pred)
+            r2 = r2_score(y_train, y_pred)
+
+            #Log Matrics
+            mlflow.log_metrics({
+                "RMSE_train": rmse,
+                "MAE_train": mae,
+                "MAPE0_train": mape,
+                "R2_SCORE_train": r2
+            })
+            
             y_pred = random_search.best_estimator_.predict(X_test)
             
             # Log parameters 
             mlflow.log_params(random_search.best_params_)
+            
             # Calculate and log the evaluation metric (e.g., RMSE)
             rmse = mean_squared_error(y_test, y_pred, squared=False)
             mape = mean_absolute_percentage_error(y_test, y_pred)
@@ -76,6 +98,7 @@ def myModelxgb(X_train, X_test, y_train, y_test) -> xgb.XGBRegressor:
                 "R2_SCORE": r2
             })
 
+
             # Saving the best model obtained after hyperparameter tuning
             mlflow.sklearn.log_model(random_search.best_estimator_, 'XGBoost_best_model')
 
@@ -84,7 +107,8 @@ def myModelxgb(X_train, X_test, y_train, y_test) -> xgb.XGBRegressor:
         logger.error(f"in myModelxgb(): {e}")
 
 if __name__ == '__main__':
-    df = getData(r'../data/featurePipelineFinalData.parquet')
+    df = getData(r'../data/feature-2022.parquet')
+    # df2 = getData(r'../data/feature-2023.parquet')
     X_train, X_test, y_train, y_test = splitting()
     best_model = myModelxgb(X_train, X_test, y_train, y_test)
     # we have to use 'best_model' for further predictions or inference
