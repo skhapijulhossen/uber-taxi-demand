@@ -1,3 +1,6 @@
 notebooks/b_PreProcess/.ipynb_checkpoints/
 data/
 notebooks/b_PreProcess/a_EDA/.ipynb_checkpoints/
+notebooks/c_ModelExperimentation/.ipynb_checkpoints
+code/mlruns
+notebooks/c_ModelExperimentation/mlruns
