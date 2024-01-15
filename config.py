@@ -1,0 +1,1 @@
+DATA_SOURCE = 'D:/uber-taxi-demand/data/yellow_tripdata_2022-01.parquet'

@@ -4,3 +4,5 @@ notebooks/b_PreProcess/a_EDA/.ipynb_checkpoints/
 notebooks/c_ModelExperimentation/.ipynb_checkpoints
 code/mlruns
 notebooks/c_ModelExperimentation/mlruns
+__pycache__/
+zenenv/
