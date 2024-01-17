@@ -5,3 +5,7 @@ data/
 notebooks/c_Model/mlruns
 notebooks/d_Tuning/mlruns
 code/mlruns
+steps/__pycache__
+.zen
+__pycache__
+code/some_Backup_resorce.ipynb
