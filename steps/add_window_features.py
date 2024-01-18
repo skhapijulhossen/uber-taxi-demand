@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 @step(enable_cache=True)
 def AddWindowFeatures(
-        data: Union[dd.DataFrame, pd.DataFrame]) -> Union[dd.DataFrame, pd.DataFrame]:
+        data: Union[dd.DataFrame, pd.DataFrame]) -> Union[dd.DataFrame, pd.DataFrame, None]:
     """Add window features to the dataframe
 
     Args:

@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 @step(enable_cache=True)
 def ReduceDimensionality(
-    data: Union[pd.DataFrame, dd.DataFrame]) -> Union[pd.DataFrame, dd.DataFrame]:
+    data: Union[pd.DataFrame, dd.DataFrame]) -> Union[pd.DataFrame, dd.DataFrame, None]:
     """
     Reduce the dimensionality of the data by using PCA.
     """
@@ -25,6 +25,7 @@ def ReduceDimensionality(
             f'PC{i}' for i in range(1, 4)])
         data['taxi_demand'] = target
         logger.info(f'==> Successfully processed ReduceDimensionality()')
+        return data
     except Exception as e:
         logger.error(f"in ReduceDimensionality(): {e}")
         return None

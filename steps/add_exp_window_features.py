@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 
 @step(enable_cache=True)
 def ADDExpandingWindowFeatures(
-    data: Union[pd.DataFrame, dd.DataFrame]) -> Union[pd.DataFrame, dd.DataFrame]:
+    data: Union[pd.DataFrame, dd.DataFrame]) -> Union[pd.DataFrame, dd.DataFrame, None]:
     """
     Add expanding window features to the dataframe.
     """
@@ -27,6 +27,7 @@ def ADDExpandingWindowFeatures(
         for col in list(features.columns)[3:]:
             data[col] = features[col].values
         logger.info(f'==> Successfully processed ADDExpandingWindowFeatures()')
+        return data
     except Exception as e:
         logger.error(f'in ADDExpandingWindowFeatures(): {e}')
         return None

@@ -28,7 +28,7 @@ def optimizeToFitMemory(ddf) -> bool:
 
 # Define the ingest step
 @step(enable_cache=True)
-def ingest_data(DATA_SOURCE) -> Union[pd.DataFrame, None]:
+def ingest_data(DATA_SOURCE: str) -> Union[pd.DataFrame, None]:
     """
     Get data from the source and return a DataFrame.
     """

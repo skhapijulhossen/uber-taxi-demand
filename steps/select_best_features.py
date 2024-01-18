@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 @step(enable_cache=True)
 def SelectBestFeatures(
-    data: Union[pd.DataFrame, dd.DataFrame]) -> Union[pd.DataFrame, dd.DataFrame]:
+    data: Union[pd.DataFrame, dd.DataFrame]) -> Union[pd.DataFrame, dd.DataFrame, None]:
     """
     Select best features from the data
     """
@@ -35,6 +35,7 @@ def SelectBestFeatures(
         data = data[['timestamp']+list(scs_columns)]
         data['taxi_demand'] = y
         logger.info(f'==> Successfully processed SelectBestFeatures()')
+        return data
     except Exception as e:
         logger.error(f'in SelectBestFeatures(): {e}')
         return None
