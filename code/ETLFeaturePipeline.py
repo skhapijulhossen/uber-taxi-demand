@@ -1,14 +1,25 @@
+import sys
+import os
+
+current = os.path.dirname(os.path.abspath(__file__))
+parent = os.path.dirname(current)
+sys.path.append(parent)
+sys.path.append(os.path.join(parent, 'steps'))
+
+
+# Now you can import modules from the parent directory
 from zenml import pipeline
-from steps.ingest import ingest_data, optimizeToFitMemory
-from steps.clean import clean_data
-from steps.add_temporal_features import AddTemporalFeatures
-from steps.add_lag_features import AddLagFeatures
 from steps.add_window_features import AddWindowFeatures
-import config
+from steps.add_lag_features import AddLagFeatures
+from steps.add_temporal_features import AddTemporalFeatures
+from steps.clean import clean_data
+from steps.ingest import ingest_data
+from steps.scale import scale_data
+from steps.load import load_features
 import logging
+import config
 
-
-@pipeline(enable_cache=True)
+@pipeline(enable_cache=True, name='ETLFeaturePipeline', enable_step_logs=True)
 def run_pipeline():
     """
     Pipeline that runs the ingest, clean, lag and window features.
@@ -20,6 +31,8 @@ def run_pipeline():
         data = AddTemporalFeatures(data)
         data = AddLagFeatures(data)
         data = AddWindowFeatures(data)
+        data = scale_data(data)
+        success = load_features(data)
         logging.info(f'==> Successfully processed run_pipeline()')
     except Exception as e:
         logging.error(f'==> Error in run_pipeline(): {e}')
