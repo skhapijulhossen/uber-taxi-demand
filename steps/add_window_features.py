@@ -8,7 +8,7 @@ from feature_engine.timeseries.forecasting import WindowFeatures
 logger = logging.getLogger(__name__)
 
 
-@step(enable_cache=True)
+@step(name='Generate Window Features', enable_step_logs=True, enable_artifact_metadata=True)
 def AddWindowFeatures(
         data: Union[dd.DataFrame, pd.DataFrame]) -> Union[dd.DataFrame, pd.DataFrame]:
     """Add window features to the dataframe

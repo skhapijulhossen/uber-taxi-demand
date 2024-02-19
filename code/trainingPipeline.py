@@ -15,7 +15,7 @@ from zenml import pipeline, client
 # Now you can import modules from the parent directory
 
 
-@pipeline(enable_cache=True, enable_artifact_metadata=True, name='trainPipelineUberTaxiDemand', enable_step_logs=True)
+@pipeline(enable_artifact_metadata=True, name='trainPipelineUberTaxiDemand', enable_step_logs=True)
 def trainPipeline():
     """
     Pipeline trains Model.

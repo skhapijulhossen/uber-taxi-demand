@@ -10,7 +10,7 @@ import config
 logger = logging.getLogger(__name__)
 
 
-@step(enable_cache=True)
+@step(name='Data Scaling', enable_step_logs=True, enable_artifact_metadata=True)
 def scale_data(data: pd.DataFrame) -> Union[pd.DataFrame, None]:
     """Scaling step.
     Args:
@@ -30,8 +30,10 @@ def scale_data(data: pd.DataFrame) -> Union[pd.DataFrame, None]:
         del temp
         # save Scaler model
         joblib.dump(scaler, os.path.join('model', 'scaler.pkl'))
-        logger.info(f'Scaler model saved to {os.path.join("model", "scaler.pkl")}')
-        print(data.columns)
+        logger.info(
+            f'Scaler model saved to {os.path.join("model", "scaler.pkl")}')
+        data.dropna(inplace=True)
+        data.to_parquet('data/feature.parquet', index=False)
         logger.info(f'==> Successfully processed scale_data()')
         return data
     except Exception as e:

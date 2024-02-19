@@ -8,7 +8,7 @@ from typing import Union
 logger = logging.getLogger(__name__)
 
 
-@step(enable_cache=True)
+@step(name='Data Cleaning', enable_step_logs=True, enable_artifact_metadata=True)
 def clean_data(data: Union[pd.DataFrame, dd.DataFrame]) -> Union[pd.DataFrame, dd.DataFrame, None]:
     """
     Clean the data by removing duplicates and null values.

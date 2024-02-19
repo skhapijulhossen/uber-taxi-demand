@@ -19,21 +19,19 @@ from steps.load import load_features
 import logging
 import config
 
-@pipeline(enable_cache=True, name='ETLFeaturePipeline', enable_step_logs=True)
+@pipeline(name='ETLFeaturePipelineUberTaxiDemand', enable_step_logs=True)
 def run_pipeline():
     """
     Pipeline that runs the ingest, clean, lag and window features.
     """
     try:
-        logging.info(f'==> Processing run_pipeline()')
         data = ingest_data(DATA_SOURCE=config.DATA_SOURCE)
         data = clean_data(data)
         data = AddTemporalFeatures(data)
         data = AddLagFeatures(data)
         data = AddWindowFeatures(data)
         data = scale_data(data)
-        success = load_features(data)
-        logging.info(f'==> Successfully processed run_pipeline()')
+        # success = load_features(data)
     except Exception as e:
         logging.error(f'==> Error in run_pipeline(): {e}')
 

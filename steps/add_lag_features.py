@@ -8,7 +8,7 @@ from feature_engine.timeseries.forecasting import LagFeatures
 logger = logging.getLogger(__name__)
 
 
-@step(enable_cache=True)
+@step(name='Generate Lag Features', enable_step_logs=True, enable_artifact_metadata=True)
 def AddLagFeatures(data: Union[pd.DataFrame, dd.DataFrame]) -> Union[pd.DataFrame, dd.DataFrame, None]:
     """
     Add lag features to the data.
