@@ -6,3 +6,4 @@ code/mlruns
 notebooks/c_ModelExperimentation/mlruns
 __pycache__/
 zenenv/
+mlruns/

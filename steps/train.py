@@ -11,8 +11,10 @@ from sklearn.metrics import mean_absolute_percentage_error, r2_score
 from numpy import ndarray
 from pandas import DataFrame, Series
 from zenml import step, client
-from typing import Union, Dict
-from evaluate import evaluate
+from typing import Union, Dict, Tuple, Annotated
+import pandas as pd
+
+
 logger = logging.getLogger(__name__)
 
 
@@ -20,21 +22,21 @@ logger = logging.getLogger(__name__)
 tracker = client.Client().active_stack.experiment_tracker
 
 
-@step(name='Train XGBoostRegressor', experiment_tracker=tracker.name)
-def trainXGB(data: Dict) -> Union[BaseEstimator, None]:
+@step(name='Hyper-parameter Tuning Step', experiment_tracker=tracker.name, enable_artifact_metadata=True, enable_artifact_visualization=True, enable_step_logs=True)
+def train_model(
+        X_train: Annotated[pd.DataFrame, 'X_train'],
+        y_train: Annotated[pd.DataFrame, 'y_train'],
+        model_name: str) -> Annotated[BaseEstimator, 'model']:
     """
-    This step trains a model using the xgboost library
-
+    Train the model using XGBoost.
     Args:
-        data (Union[pd.DataFrame, None]): The input data
-
+        X_train: Training data
+        y_train: Target values
     Returns:
-        XGBoost: The trained model
+        model: Trained model
     """
     try:
-        logger.info(f'==> Processing trainXGB()')
-        X_train = data['X_train']
-        y_train = data['y_train']
+        logger.info(f'==> Processing train_model()')
 
         xgb_model = XGBRegressor()
         param_dist = {
@@ -57,7 +59,7 @@ def trainXGB(data: Dict) -> Union[BaseEstimator, None]:
         mlflow.log_params(random_search.best_params_)
         # Saving the best model obtained after hyperparameter tuning
         mlflow.sklearn.log_model(
-                random_search.best_estimator_, f'{config.MODEL_NAME}-XGBoost')
+            random_search.best_estimator_, f'{config.MODEL_NAME}-XGBoost')
 
         logger.info(f'==> Successfully processed trainXGB()')
         return random_search.best_estimator_

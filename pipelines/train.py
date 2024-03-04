@@ -6,9 +6,9 @@ sys.path.append(parent)
 sys.path.append(os.path.join(parent, 'steps'))
 import config
 import logging
-from steps.train import trainXGB
-from steps.split import split
-from steps.evaluate import evaluate
+from steps.train import train_model
+from steps.split import split_data
+from steps.evaluate import evaluate_model
 from zenml import pipeline, client
 
 
@@ -22,11 +22,9 @@ def trainPipeline():
     """
     try:
         
-        data = split()
-        model = trainXGB(data)
-
-        evaluate(data=data, model=model, label='TRAIN')
-        evaluate(data=data, model=model, label='TEST')
+        X_train, X_test, y_train, y_test = split_data()
+        model = train_model(X_train, y_train)
+        r2_score, mape = evaluate_model(model, X_test, y_test)
 
     except Exception as e:
         logging.error(f'==> Error in trainPipeline(): {e}')

@@ -16,6 +16,3 @@ def extract() -> None:
         feature = pd.read_parquet(feature_path).tail(1)
     except Exception as e:
         print(e)
-
-
-def getModel()
