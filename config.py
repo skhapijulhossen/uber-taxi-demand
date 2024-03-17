@@ -2,7 +2,6 @@ DATA_SOURCE = 'https://d37ci6vzurychx.cloudfront.net/trip-data/yellow_tripdata_2
 DATA_SOURCE = 'data/yellow_tripdata_2022-01.parquet'
 FEATURE_GROUP_NAME = 'taxi_demand_hourly'
 FEATURE_GROUP_DESCRIPTION = "Hourly Taxi Demand hourly sampled"
-API_KEY_HOPSWORKS = 'iS9O9H01oRxEzuHI.YMzWi2ap65sQZqqoZR6tO8PICrbPwl0zCuP94bqX1miHK2m66EkcPEZwMWY88wTk'
 FEATURE_DESCRIPTIONS = [
     {"name": "timestamp", "description": "Timestamp indicating the time of observation"},
     {"name": "taxi_demand", "description": "Demand for taxis at the specified timestamp"},
@@ -67,7 +66,3 @@ FEATURE_DESCRIPTIONS = [
 ]
 
 TABLE_NAME = 'uber-texi-demand-hourly'
-# AWS credentials
-AWS_ACCESS_KEY_ID = 'AKIA6EQMX6OHIBMJEPUZ'
-AWS_SECRET_ACCESS_KEY = '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'
-MODEL_NAME = 'uber-taxi-demand-hourly'
